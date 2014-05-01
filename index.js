@@ -69,14 +69,14 @@ function parseUnread() {
     if (err) {
       self.emit('error', err);
     } else if (results.length > 0) {
-      processMail.call(this, results);
+      processMail.call(self, results);
     }
   });
 }
 
 function processMail(items) {
   var self = this;
-  var f = self.imap.fetch(results, {
+  var f = this.imap.fetch(items, {
     bodies: '',
     markSeen: self.markSeen
   });
