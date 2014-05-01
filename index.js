@@ -69,22 +69,27 @@ function parseUnread() {
     if (err) {
       self.emit('error', err);
     } else if (results.length > 0) {
-      var f = self.imap.fetch(results, {
-        bodies: '',
-        markSeen: self.markSeen
-      });
-      f.on('message', function(msg, seqno) {
-        var parser = new MailParser(self.mailParserOptions);
-        parser.on("end", function(mail) {
-          self.emit('mail', mail, seqno);
-        });
-        msg.on('body', function(stream, info) {
-          stream.pipe(parser);
-        });
-      });
-      f.once('error', function(err) {
-        self.emit('error', err);
-      });
+      processMail.call(this, results);
     }
+  });
+}
+
+function processMail(items) {
+  var self = this;
+  var f = self.imap.fetch(results, {
+    bodies: '',
+    markSeen: self.markSeen
+  });
+  f.on('message', function(msg, seqno) {
+    var parser = new MailParser(self.mailParserOptions);
+    parser.on("end", function(mail) {
+      self.emit('mail', mail, seqno);
+    });
+    msg.on('body', function(stream, info) {
+      stream.pipe(parser);
+    });
+  });
+  f.once('error', function(err) {
+    self.emit('error', err);
   });
 }
